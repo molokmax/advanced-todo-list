@@ -57,6 +57,19 @@
 
 <script>
 
+function generateCompare(fieldName, order) {
+  return function(a, b) {
+    if (a[fieldName] < b[fieldName]) {
+      return order === 'asc' ? -1 : 1;
+    }
+    if (a[fieldName] > b[fieldName]) {
+      return order === 'asc' ? 1 : -1;
+    }
+    return 0;
+  }
+}
+
+
 export default {
   name: 'App',
   data() {
@@ -64,6 +77,8 @@ export default {
       store: [],
       filters: [],
       search: '',
+      orderFieldName: 'title',
+      orderDirection: 'asc',
       savedData: '',
       currentRecord: {
         title: '',
@@ -133,8 +148,11 @@ export default {
         dict[el.category].push(el)
       })
       let result = []
+      let compare = generateCompare(this.orderFieldName, this.orderDirection)
       for (let k of Object.keys(dict)) {
-        let i = { category: k, list: dict[k] }
+
+        let list = dict[k].sort(compare)
+        let i = { category: k, list: list }
         result.push(i)
       }
       return result
